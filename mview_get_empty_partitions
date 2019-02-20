@@ -1,0 +1,19 @@
+-- Get the list of all mviews in the env - in file named mvs
+-- Download https://github.com/tolbertam/sstable-tools
+-- Run the below script 
+[root@ip-10-216-55-166 ~]# cat ts.sh 
+rm /tmp/y
+for i in $(find /data/data/<env>_* -name "*-Data.db" | grep -v '/snapshots/' | grep -v '/backups/' | grep -f ~/mvs)
+do 
+   java -jar sstable-tools-3.11.0-alpha11.jar describe $i | grep -E -A2 'Rows|Widest Partitions' | sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" > /tmp/x
+   grep "\[\]" /tmp/x
+   if [[ $? -eq 0 ]]
+   then
+      x=$(grep "\[\]" /tmp/x)
+      y=$(grep "^Rows:" /tmp/x)
+      ks=$(echo $i | cut -f4 -d'/')
+      mv=$(echo $i | cut -f5 -d'/' | cut -f1 -d'-')
+      sst=$(echo $i | cut -f6 -d'/')
+      echo $ks "|" $mv "|" $sst "|" $y "|" $x >> /tmp/y
+   fi
+done
