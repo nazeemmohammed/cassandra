@@ -17,3 +17,6 @@ do
       echo $ks "|" $mv "|" $sst "|" $y "|" $x >> /tmp/y
    fi
 done
+
+-- To get rid of empty partitions, first find all the primary keys which are having emoty values in mview col. select * from t where c3 = '' allow filtering.
+-- Using the primary keys loop through for all records, either "update t set c3 = null where c1 = 5; -- using ttl does not matter for cols being set to null, it takes into effect only when the column is not null" or "delete c3 from t where c1 = 2;"
